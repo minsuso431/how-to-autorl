@@ -369,14 +369,23 @@ class HydraMODEHB(modehb.MODEHB):
                                 np.std(means)
                             ]
                         elif self.stability_objective == "max_min_return":
+                            if self.maximize:
+                                st_value = min(means) # Maximize the min(mean)
+                            else:
+                                st_value = max(means) # Minimize the max(-mean)
                             launching_jobs[i]["fitness"] = [
                                 np.mean(means),
-                                max(means) # Maximize the min(mean) -> Minimize the max(-mean)
+                                st_value
                             ]
                         elif self.stability_objective == "max_min_return_quantile":
+                            if self.maximize:
+                                st_value = np.quantile(means, 0.25) # Maximize the first quartile
+                            else:
+                                st_value = np.quantile(means, 0.75) # Minimize the third quartile
+
                             launching_jobs[i]["fitness"] = [
                                 np.mean(means),
-                                np.quantile(means, 0.75)
+                                st_value
                             ]
                         else:
                             raise ValueError(f'Unknown stability objective, {self.stability_objective}')
